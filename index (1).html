@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#160d16">
+    <title>Cinematic Love Note</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="heart-transition"></div>
+    <div class="loader" id="loader" aria-label="Loading cinematic note">
+      <div class="loader__mark">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <p class="loader__text">Warming the glow</p>
+      <div class="loader__track"><span></span></div>
+    </div>
+
+    <canvas id="sparkleCanvas" aria-hidden="true"></canvas>
+    <div class="screen-shimmer" aria-hidden="true"></div>
+    <div class="ambient-bg" aria-hidden="true">
+      <div class="gradient-field" data-parallax data-depth="0.06"></div>
+    </div>
+    <div class="heart-field" id="heartField" aria-hidden="true"></div>
+    <div class="celebration-vignette" aria-hidden="true"></div>
+    <div class="cursor-dot" aria-hidden="true"></div>
+    <div class="cursor-glow" aria-hidden="true"></div>
+
+    <button class="music-toggle magnetic" id="musicToggle" type="button" aria-label="Play ambient music" aria-pressed="false">
+      <i data-lucide="music-2" aria-hidden="true"></i>
+    </button>
+
+    <main>
+      <section class="scene hero" id="top" data-tone-a="#170d16" data-tone-b="#40202c" data-tone-c="#14606a">
+        <div class="hero__content">
+          <p class="eyebrow reveal">A soft animated web for YOU </p>
+          <h1 class="hero-title split-letters">Happiest Birthday!!!</h1>
+          <p class="hero-copy reveal">
+            A Small Cinematic Page For Ma One n Only HomeGirl Dacquoise.purr(Aka Dinosorous) To Show How Much I Appreciate Ma Fav Person On Her Special Day :>
+          </p>
+          <div class="personalizer reveal">
+            <label for="nameInput">So, whose birthday is it todayy?</label>
+            <input id="nameInput" type="text" autocomplete="name" placeholder="Type your name here"/>
+          </div>
+          <p class="personal-greeting reveal" id="personalGreeting">For someone unforgettable.</p>
+        </div>
+
+        <div class="hero-constellation" data-parallax data-depth="0.18" aria-hidden="true">
+          <span class="constellation-ring ring-one"></span>
+          <span class="constellation-ring ring-two"></span>
+          <span class="constellation-ring ring-three"></span>
+          <span class="constellation-heart heart-one">&hearts;</span>
+          <span class="constellation-heart heart-two">&hearts;</span>
+          <span class="constellation-heart heart-three">&hearts;</span>
+          <span class="constellation-heart heart-4">&hearts;</span>
+          <span class="constellation-heart heart-5">&hearts;</span>
+          <span class="constellation-heart heart-6">&hearts;</span>
+          <span class="constellation-heart heart-7">&hearts;</span>
+          <span class="constellation-heart heart-8">&hearts;</span>
+          <span class="constellation-heart heart-9">&hearts;</span>
+          <span class="constellation-heart heart-10">&hearts;</span>
+          <span class="constellation-heart heart-11">&hearts;</span>
+          <span class="constellation-heart heart-12">&hearts;</span>
+          <span class="constellation-label">tiny magic
+            click here
+            AT LAST
+          </span>
+        </div>
+
+        <a class="scroll-cue magnetic" href="#story" aria-label="Scroll to story">
+          <i data-lucide="arrow-down" aria-hidden="true"></i>
+        </a>
+      </section>
+
+      <section class="scene timeline-scene" id="memories"
+  data-tone-a="#111318" data-tone-b="#3b2648" data-tone-c="#1f5c50">
+  <div class="section-intro reveal" data-speed="0.14">
+    <p class="eyebrow">Scene one</p>
+    <h2 class="split-words">A Few Moments Worth Keeping.</h2>
+  </div>
+  <div class="timeline reveal">
+    <div class="tl-item">
+      <div class="tl-year">The Beginning</div>
+      <div class="tl-title">When We First Started Talking</div>
+      <p class="tl-desc">Didn't know then that this person was gonna become one of the most important ones. Funny how that works.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">Late Nights</div>
+      <div class="tl-title">Study Sessions &amp; Sleepy Rants</div>
+      <p class="tl-desc">You helping me out even when you were exhausted. That's not something I'll forget easily, twin.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">Talking Together</div>
+      <div class="tl-title">When You Just Show Up Online</div>
+      <p class="tl-desc">And somehow everything feels a little lighter. You probably don't even know you do that.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">Right Now</div>
+      <div class="tl-title">Your Birthday :></div>
+      <p class="tl-desc">A whole page made just for you, because words in a chat felt too small. Happy Birthday, Dinu.</p>
+    </div>
+  </div>
+</section>
+
+      <section class="scene story" id="story" data-tone-a="#161018" data-tone-b="#4b2633" data-tone-c="#82602a">
+        <div class="section-intro reveal" data-speed="0.18">
+          <p class="eyebrow">Scene two</p>
+          <h2 class="split-words">What I Feel About You</h2>
+        </div>
+        <div class="story-grid">
+          <article class="story-panel reveal tilt-card" data-speed="0.23">
+            <span class="panel-number">01</span>
+            <h3>Ma Pookie Twin</h3>
+            <p>Who is one of the most prettiest girl ive ever met in my life, and still she trash talk about herself, thats something i hate about you.</p>
+          </article>
+          <article class="story-panel reveal tilt-card" data-speed="0.18">
+            <span class="panel-number">02</span>
+            <h3>LIl Dinu's Personality</h3>
+            <p>She's the most caring person I know, she loves her pets more than anything even tho they are no more, She talks to me like she's the only one who can understand ma language.</p>
+          </article>
+          <article class="story-panel reveal tilt-card" data-speed="0.28">
+            <span class="panel-number">03</span>
+            <h3>Little Cuteee Reactions</h3>
+            <p>Her little habits of making cute faces and her humph sounds genuenly makes me feel softer cuz i could just sit for hours watching her making those faces.</p>
+          </article>
+        </div>
+      </section>
+
+
+
+
+
+      <section class="scene compliments" id="compliments" data-tone-a="#150f15" data-tone-b="#63333f" data-tone-c="#176268">
+        <div class="section-intro reveal" data-speed="0.44">
+          <p class="eyebrow">Compliments</p>
+          <h2 class="split-words">Six tiny truths, floating in place.</h2>
+        </div>
+        <div class="compliment-grid">
+          <button class="compliment-card reveal tilt-card magnetic" type="button" data-compliment="Deepu Makes Me Smile Whenever She Comes Online After being off for some time.">
+            <span>01</span>
+            <strong>Deepu Makes Me Smile Whenever She Comes Online After being off for some time .</strong>
+          </button>
+          <button class="compliment-card reveal tilt-card magnetic" type="button" data-compliment="She Cares For Everyone's Feelings And Makes Sure No One Feels Left Out.">
+            <span>02</span>
+            <strong>She Cares For Everyone's Feelings And Makes Sure No One Feels Left Out.</strong>
+          </button>
+          <button class="compliment-card reveal tilt-card magnetic" type="button" data-compliment="Deepu Helps Me In Studies Even If She's Tired or Haven't Finished Her Revision Till Late Night.">
+            <span>03</span>
+            <strong>Deepu Helps Me In Studies Even If She's Tired or Haven't Finished Her Revision Till Late Night OwO</strong>
+          </button>
+          <button class="compliment-card reveal tilt-card magnetic" type="button" data-compliment="Ma Fav Dinu Is Sleepy Deepur Coz She Makes Cute Sound And Mutter Random Words Like "mate i wanna be a dragon, bird, etc..."">
+            <span>04</span>
+            <strong>Ma Fav Dinu Is Sleepy Deepur Coz She Makes Cute Sound And Mutter Random Words Like "mate i wanna be a dragon, bird, etc..." :)</strong>
+          </button>
+          <button class="compliment-card reveal tilt-card magnetic" type="button" data-compliment="Deepu Makes The Vibe 10x Better Whenever She's Around Just By Her Presence Atleast Thats The Case For Me :>.">
+            <span>05</span>
+            <strong>Deepu Makes The Vibe 10x Better Whenever She's Around Just By Her Presence Atleast Thats The Case For Me :></strong>
+          </button>
+          <button class="compliment-card reveal tilt-card magnetic" type="button" data-compliment="I Always Fail To See The Insecurities You Point Out Twin And IK Its Just Ur DeLuLu Cuz Js Perfect The Way You Are Right Now :]"">
+            <span>06</span>
+            <strong>I Always Fail To See The Insecurities You Point Out Twin And IK Its Just Ur DeLuLu Cuz Js Perfect The Way You Are Right Now :]</strong>
+          </button>
+        </div>
+      </section>
+
+      <section class="scene note" id="note" data-tone-a="#121317" data-tone-b="#33483f" data-tone-c="#7b344c">
+        <div class="note-wrap reveal" data-speed="0.12">
+          <p class="eyebrow">Special note</p>
+          <h2 class="split-words">Read this slowly.</h2>
+          <div class="note-panel">
+            <p class="typing-line" data-template="Dear {name},"></p>
+            <p class="typing-line" data-template="Once Again Happiest Birthday! To ma {name}, I Hope hmm!!! NO (X) I Know Timi Strong Girl Ho Right Nothing Will Ever Happen To You Even If smth Happens IK You'll Come To Me Right?? Please Do"></p>
+            <p class="typing-line" data-template="And Feri Vandei Xu Stop Sayin Ur Ugly Plese I Really Hate That Like Kasari Vanna Sakxeu K Testo With That Lethal Face Face Card Except For Ur Skinny Jiyu :P "></p>
+            <p class="typing-line" data-template="I Hope You Liked This Small Web That I Made For You Thats How Yk Ur Someone Special :> This Tooks Days too Finish Hope It :) "></p>
+          </div>
+        </div>
+      </section>
+
+      <section class="scene surprise" id="surprise" data-tone-a="#170f14" data-tone-b="#743344" data-tone-c="#1c6869">
+        <div class="surprise__inner reveal" data-speed="0.1">
+          <p class="eyebrow">Final scene</p>
+          <h2 class="split-words">One last hidden spark.</h2>
+          <button class="surprise-button magnetic" id="surpriseButton" type="button">
+            <span>Open Surprise</span>
+            <span class="button-heart">&hearts;</span>
+          </button>
+          <div class="surprise-message" id="surpriseMessage" aria-live="polite">
+            <p class="surprise-kicker">For <span id="surpriseName">you</span></p>
+            <h3 class="split-surprise">You are loved in all the little ways that never need to be loud.</h3>
+            <p>May this small sky keep a little glow for you whenever you return.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/MotionPathPlugin.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
