@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>27 - Animated galaxy</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+    canvas.webgl {
+      position: fixed; top: 0; left: 0; outline: none;
+      opacity: 0;
+      transition: opacity 1.4s ease;
+    }
+    canvas.webgl.visible { opacity: 1; }
+    canvas.webgl.fade-out { opacity: 0; }
+  </style>
+</head>
+<body>
+  <canvas class="webgl"></canvas>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
+
+  <script>
+    const canvas = document.querySelector('canvas.webgl');
+    const scene  = new THREE.Scene();
+    const loader = new THREE.TextureLoader();
+
+    // ── FADE IN on load ──
+    window.addEventListener('load', () => {
+      requestAnimationFrame(() => canvas.classList.add('visible'));
+    });
+
+    // ── FADE OUT on leave ──
+    window.addEventListener('pagehide', () => {
+      canvas.classList.remove('visible');
+      canvas.classList.add('fade-out');
+    });
+    window.addEventListener('beforeunload', () => {
+      canvas.classList.remove('visible');
+      canvas.classList.add('fade-out');
+    });
+
+    // ── ORBITING PHOTOS ──
+    const orbitPhotos = [];
+    const orbitData = [
+      "image/IMG_20260506_121645_786.jpg",
+      "image/IMG_20260506_105733_504.jpg",
+      "image/IMG_20260506_105621_426.jpg",
+      "image/Screenshot_20260506_174746.jpg",
+      "image/IMG_20260502_193815_186.jpg",
+      "image/IMG-20260506-WA0002.jpg"
+    ];
+
+    // ── GUI ──
+    const gui = new dat.GUI({ width: 340 });
+    const parameters = {
+      count: 380700, size: 0.022, radius: 9.92, branches: 9,
+      spin: 0.443, randomness: 1.159, randomnessPower: 3.565,
+      insideColor: '#991a00', outsideColor: '#730039'
+    };
+
+    // ── MAIN GALAXY ──
+    let geometry = null, material = null, points = null;
+
+    function generateGalaxy() {
+      if (points) { geometry.dispose(); material.dispose(); scene.remove(points); }
+      geometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(parameters.count * 3);
+      const colors    = new Float32Array(parameters.count * 3);
+      const cIn  = new THREE.Color(parameters.insideColor);
+      const cOut = new THREE.Color(parameters.outsideColor);
+
+      for (let i = 0; i < parameters.count; i++) {
+        const i3 = i * 3;
+        const r  = Math.pow(Math.random(), 2) * parameters.radius;
+        const sp = r * parameters.spin;
+        const br = ((i % parameters.branches) / parameters.branches) * Math.PI * 2;
+        const rx = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * r;
+        const ry = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * r;
+        const rz = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * r;
+        positions[i3]   = Math.cos(br + sp) * r + rx;
+        positions[i3+1] = ry;
+        positions[i3+2] = Math.sin(br + sp) * r + rz;
+        const m = cIn.clone().lerp(cOut, r / parameters.radius);
+        colors[i3] = m.r; colors[i3+1] = m.g; colors[i3+2] = m.b;
+      }
+
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('color',    new THREE.BufferAttribute(colors, 3));
+      material = new THREE.PointsMaterial({
+        size: parameters.size, sizeAttenuation: true,
+        depthWrite: false, blending: THREE.AdditiveBlending, vertexColors: true
+      });
+      points = new THREE.Points(geometry, material);
+      scene.add(points);
+    }
+    generateGalaxy();
+
+    // ── BACKGROUND SPIRAL GALAXIES ──
+    const SCALE = 0.060;
+
+    function makeSpiralGalaxyGeometry(hue, dimFactor = 1.0) {
+      const numArms = 3;
+      const passes = [
+        { maxR: 80  + Math.random() * 50,  starsPerArm: 180, scatter: 5,  alphaBase: 0.55, alphaRand: 0.40, litBase: 70 },
+        { maxR: 160 + Math.random() * 60,  starsPerArm: 160, scatter: 9,  alphaBase: 0.38, alphaRand: 0.35, litBase: 62 },
+        { maxR: 260 + Math.random() * 80,  starsPerArm: 130, scatter: 14, alphaBase: 0.20, alphaRand: 0.25, litBase: 55 }
+      ];
+
+      const coreCount = 100;
+      let total = coreCount;
+      passes.forEach(p => { total += numArms * p.starsPerArm; });
+
+      const pos = new Float32Array(total * 3);
+      const col = new Float32Array(total * 3);
+      let idx = 0;
+
+      for (let pi = 0; pi < passes.length; pi++) {
+        const pass = passes[pi];
+        for (let arm = 0; arm < numArms; arm++) {
+          const armOffset = (arm / numArms) * Math.PI * 2;
+          for (let sk = 0; sk < pass.starsPerArm; sk++) {
+            const t       = sk / pass.starsPerArm;
+            const r       = t * pass.maxR;
+            const theta   = armOffset + t * Math.PI * 3.0;
+            const scatter = (Math.random() - 0.5) * pass.scatter * (1 + t);
+            pos[idx*3]   = (r * Math.cos(theta) + scatter) * SCALE;
+            pos[idx*3+1] = (Math.random() - 0.5) * pass.scatter * 0.3 * SCALE;
+            pos[idx*3+2] = (r * Math.sin(theta) + scatter) * SCALE;
+            const starHue = ((hue + (Math.random() - 0.5) * 45 + 360) % 360) / 360;
+            const sat     = (60 + Math.random() * 40) / 100;
+            const lit     = (pass.litBase + Math.random() * 22) / 100;
+            const alpha   = (pass.alphaBase + Math.random() * pass.alphaRand) * dimFactor;
+            const c = new THREE.Color().setHSL(starHue, sat, lit);
+            col[idx*3]   = c.r * alpha;
+            col[idx*3+1] = c.g * alpha;
+            col[idx*3+2] = c.b * alpha;
+            idx++;
+          }
+        }
+      }
+
+      for (let ck = 0; ck < coreCount; ck++) {
+        const coreR = Math.random() * 22;
+        const coreA = Math.random() * Math.PI * 2;
+        pos[idx*3]   = coreR * Math.cos(coreA) * SCALE;
+        pos[idx*3+1] = (Math.random() - 0.5) * 4 * SCALE;
+        pos[idx*3+2] = coreR * Math.sin(coreA) * SCALE;
+        const cHue  = ((hue + (Math.random() - 0.5) * 20 + 360) % 360) / 360;
+        const cSat  = (40 + Math.random() * 30) / 100;
+        const cLit  = (80 + Math.random() * 18) / 100;
+        const cAlpha = (0.70 + Math.random() * 0.30) * dimFactor;
+        const c = new THREE.Color().setHSL(cHue, cSat, cLit);
+        col[idx*3]   = c.r * cAlpha;
+        col[idx*3+1] = c.g * cAlpha;
+        col[idx*3+2] = c.b * cAlpha;
+        idx++;
+      }
+
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(pos.slice(0, idx * 3), 3));
+      geo.setAttribute('color',    new THREE.BufferAttribute(col.slice(0, idx * 3), 3));
+      return geo;
+    }
+
+    // ── 50 background galaxies — similar size band, spread all directions ──
+    const bgPositions = [
+      // original 20
+      [-55,  12, -80], [ 80, -18, -95], [-95,  30,  50],
+      [ 65,  50, -35], [-35, -55,  85], [100,  -8, -18],
+      [-75, -40, -55], [ 50,  70,  65], [-85,  25,  25],
+      [-150,  30, -130], [ 160, -25,  120], [-120, -60,  160],
+      [ 140,  80, -100], [-180,  10,  -60], [ 130, -90,  -80],
+      [-100,  140,  90], [ 170,  50,   70], [-160, -70, -120],
+      [ 110, -130,  140], [-130,  90, -160],
+      // 30 new — similar distance band, all directions
+      [  60,  -30,  70], [ -70,   55, -60], [  80,  40, -55],
+      [ -60,  -70,  65], [  55,   75,  40], [ -80,  -25, -70],
+      [  75,  -60, -50], [ -50,   80,  60], [  65,  -80, -45],
+      [ -90,   15,  65], [  45,  -90, -60], [ -65,  60,  75],
+      [  85,   35, -70], [ -40,  -80,  80], [  70,   70, -65],
+      [ -75,  -55,  45], [  55,  -45,  85], [ -85,   70, -30],
+      [  40,   85, -75], [ -55,  -65, -75], [  90,  -50,  55],
+      [ -45,   90, -80], [  60,  -75,  70], [ -80,   45, -65],
+      [  75,   60,  50], [ -60,  -80, -50], [  50,  -55, -85],
+      [ -85,  -35,  70], [  65,   80, -40], [ -70,   65,  55],
+    ];
+
+    bgPositions.forEach(p => {
+      const hue  = 180 + Math.random() * 180;
+      const dist = Math.sqrt(p[0]*p[0] + p[1]*p[1] + p[2]*p[2]);
+      // Tight dim range so all galaxies look similar in brightness
+      const dimFactor = Math.max(0.40, Math.min(0.75, 1 - (dist - 55) / 200));
+
+      const geo = makeSpiralGalaxyGeometry(hue, dimFactor);
+      const mat = new THREE.PointsMaterial({
+        size: 0.10,
+        sizeAttenuation: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        vertexColors: true
+      });
+
+      const gal = new THREE.Points(geo, mat);
+      gal.position.set(...p);
+      gal.rotation.x = (0.17 + Math.random() * 0.87);
+      gal.rotation.y = Math.random() * Math.PI * 2;
+      scene.add(gal);
+    });
+
+    // ── DEEP STARFIELD ──
+    (function () {
+      const count = 8000;
+      const pos = new Float32Array(count * 3);
+      const col = new Float32Array(count * 3);
+      const palettes = [
+        [1.0, 1.0, 1.0], [1.0, 0.95, 0.78],
+        [0.78, 0.88, 1.0], [1.0, 0.82, 0.65], [0.90, 0.78, 1.0]
+      ];
+      for (let i = 0; i < count; i++) {
+        const i3  = i * 3;
+        const phi = Math.acos(2 * Math.random() - 1);
+        const th  = Math.random() * Math.PI * 2;
+        const r   = 30 + Math.random() * 120;
+        pos[i3]   = r * Math.sin(phi) * Math.cos(th);
+        pos[i3+1] = r * Math.sin(phi) * Math.sin(th);
+        pos[i3+2] = r * Math.cos(phi);
+        const p = palettes[Math.floor(Math.random() * palettes.length)];
+        const b = 0.5 + Math.random() * 0.5;
+        col[i3] = p[0]*b; col[i3+1] = p[1]*b; col[i3+2] = p[2]*b;
+      }
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      geo.setAttribute('color',    new THREE.BufferAttribute(col, 3));
+      scene.add(new THREE.Points(geo, new THREE.PointsMaterial({
+        size: 0.08, sizeAttenuation: true,
+        depthWrite: false, blending: THREE.AdditiveBlending, vertexColors: true
+      })));
+    })();
+
+    // ── CAMERA ──
+    const camera = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 0.1, 500);
+    camera.position.set(3, 3, 3);
+    scene.add(camera);
+
+    // ── ORBITING PHOTOS ──
+    for (let i = 0; i < 6; i++) {
+      const tex    = loader.load(orbitData[i]);
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: tex, transparent: true, opacity: 2.0, depthWrite: false
+      }));
+      sprite.scale.set(2, 2, 1);
+      orbitPhotos.push({ sprite, angle: (i / 6) * Math.PI * 2, radius: 4 + Math.random() * 2 });
+      scene.add(sprite);
+    }
+
+    // ── ORBIT CONTROLS ──
+    let isDragging = false, prevX = 0, prevY = 0;
+    let spherical = { theta: 0.8, phi: 1.0, radius: 6 };
+
+    function updateCamera() {
+      camera.position.set(
+        spherical.radius * Math.sin(spherical.phi) * Math.sin(spherical.theta),
+        spherical.radius * Math.cos(spherical.phi),
+        spherical.radius * Math.sin(spherical.phi) * Math.cos(spherical.theta)
+      );
+      camera.lookAt(0, 0, 0);
+    }
+    updateCamera();
+
+    // ── MOUSE DRAG ──
+    canvas.addEventListener('mousedown', e => { isDragging = true; prevX = e.clientX; prevY = e.clientY; });
+    window.addEventListener('mouseup', () => isDragging = false);
+    window.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      spherical.theta -= (e.clientX - prevX) * 0.005;
+      spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.phi - (e.clientY - prevY) * 0.005));
+      prevX = e.clientX; prevY = e.clientY;
+      updateCamera();
+    });
+
+    // ── MOUSE WHEEL ZOOM ──
+    canvas.addEventListener('wheel', e => {
+      spherical.radius = Math.max(2, Math.min(120, spherical.radius + e.deltaY * 0.02));
+      updateCamera();
+    });
+
+    // ── TOUCH: single-finger drag to rotate + two-finger pinch to zoom ──
+    let lastPinch = null, lastTouchX = 0, lastTouchY = 0;
+
+    canvas.addEventListener('touchstart', e => {
+      if (e.touches.length === 1) {
+        lastTouchX = e.touches[0].clientX;
+        lastTouchY = e.touches[0].clientY;
+      }
+      if (e.touches.length === 2) lastPinch = null;
+    });
+
+    canvas.addEventListener('touchmove', e => {
+      e.preventDefault();
+      if (e.touches.length === 1) {
+        spherical.theta -= (e.touches[0].clientX - lastTouchX) * 0.005;
+        spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1,
+          spherical.phi - (e.touches[0].clientY - lastTouchY) * 0.005));
+        lastTouchX = e.touches[0].clientX;
+        lastTouchY = e.touches[0].clientY;
+        updateCamera();
+      } else if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const d  = Math.sqrt(dx*dx + dy*dy);
+        if (lastPinch !== null) {
+          spherical.radius = Math.max(2, Math.min(120, spherical.radius - (d - lastPinch) * 0.05));
+          updateCamera();
+        }
+        lastPinch = d;
+      }
+    }, { passive: false });
+
+    // ── RENDERER ──
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setSize(innerWidth, innerHeight);
+    window.addEventListener('resize', () => {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+    });
+
+    // ── ANIMATION ──
+    const clock = new THREE.Clock();
+    function tick() {
+      const t = clock.getElapsedTime();
+      if (points) points.rotation.y = t * 0.1;
+      orbitPhotos.forEach((p, i) => {
+        const a = p.angle - t * 0.2;
+        p.sprite.position.x = Math.cos(a) * p.radius;
+        p.sprite.position.z = Math.sin(a) * p.radius;
+        p.sprite.position.y = Math.sin(t + i) * 0.5;
+        p.sprite.lookAt(camera.position);
+      });
+      renderer.render(scene, camera);
+      requestAnimationFrame(tick);
+    }
+    tick();
+  </script>
+</body>
+</html>
